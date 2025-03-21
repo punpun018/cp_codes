@@ -1,0 +1,48 @@
+vector<vector<int>> adj;
+vector<int> vis, inStack;
+bool cycleExists = false;
+
+void dfs(int node) {
+    vis[node] = 1;
+    inStack[node] = 1;
+
+    for (auto neigh : adj[node]) {
+        if (!vis[neigh])
+            dfs(neigh);
+        else if (inStack[neigh])  // Back edge detected
+            cycleExists = true;
+    }
+
+    inStack[node] = 0;  // Remove from recursion stack
+}
+
+bool isCyclic(int n) {
+    vis.assign(n, 0);
+    inStack.assign(n, 0);
+    cycleExists = false;
+
+    for (int i = 0; i < n; i++)
+        if (!vis[i])
+            dfs(i);
+
+    return cycleExists;
+}
+
+int main() {
+    int n, m;
+    cin >> n >> m;  // Number of nodes and edges
+    adj.resize(n);
+
+    for (int i = 0; i < m; i++) {
+        int u, v;
+        cin >> u >> v;
+        adj[u].push_back(v);  // Directed edge u → v
+    }
+
+    if (isCyclic(n))
+        cout << "Cycle Detected\n";
+    else
+        cout << "No Cycle\n";
+
+    return 0;
+}
