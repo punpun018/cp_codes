@@ -1,0 +1,17 @@
+    function<void(int)> topoSort = [&](int cur)
+    {
+        vis[cur] = true;
+        for (auto it : adj[cur])
+        {
+            if (!vis[it])
+                topoSort(it);
+        }
+        topo.push_back(cur);
+    };
+ 
+    for (int i = 1; i <= n; i++)
+    {
+        if (!vis[i])
+            topoSort(i);
+    }
+    reverse(topo.begin(), topo.end());
