@@ -51,7 +51,6 @@ using namespace __gnu_pbds;
 const int MAX = 2000005;
 #define yes cout << "YES" << "\n"
 #define no cout << "NO" << "\n"
-#define endl "\n"
 #define inf 1000000000000000005
 const long long mod = 1e9 + 7;
 const ll N = 1e9 + 10;
