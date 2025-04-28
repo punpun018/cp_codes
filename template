@@ -33,7 +33,6 @@ using namespace __gnu_pbds;
 
 using namespace std;
 using namespace __gnu_pbds;
-#define int long long
 #define intmin LLONG_MIN
 #define intmax LLONG_MAX
 #define ll long long
