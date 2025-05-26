@@ -1,0 +1,37 @@
+    static const int LOG = 20;
+
+    void precomp(int n, vector<vector<int>>& up) {
+        for (int i = 1; i < LOG; i++) {
+            for (int j = 0; j < n; j++) {
+                int temp = up[j][i - 1];
+                if (temp != -1)
+                    up[j][i] = up[temp][i - 1];
+            }
+        }
+    }
+
+    int lift(int u, int k, vector<vector<int>>& up) {
+        for (int j = 0; j < LOG; j++) {
+            if ((k >> j) & 1) {
+                if (u == -1)
+                    break;
+                u = up[u][j];
+            }
+        }
+        return u;
+    }
+
+    int lca(int u, int v, vector<int>& dep1, vector<vector<int>>& up) {
+        if (dep1[u] < dep1[v])
+            swap(u, v);
+        u = lift(u, dep1[u] - dep1[v], up);
+        if (u == v)
+            return u;
+        for (int j = LOG - 1; j >= 0; j--) {
+            if (up[u][j] != -1 && up[u][j] != up[v][j]) {
+                u = up[u][j];
+                v = up[v][j];
+            }
+        }
+        return up[u][0];
+    }
