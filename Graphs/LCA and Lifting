@@ -1,5 +1,18 @@
     static const int LOG = 20;
 
+    void dfs(int cur, int par, vector<int>& dep1, vector<vector<int>>& up,
+             vector<vector<int>>& adj) {
+        for (auto& child : adj[cur]) {
+            if (child == par)
+                continue;
+            if (dep1[child] == -1) {
+                dep1[child] = dep1[cur] + 1;
+                up[child][0] = cur;
+                dfs(child, cur, dep1, up, adj);
+            }
+        }
+    }
+
     void precomp(int n, vector<vector<int>>& up) {
         for (int i = 1; i < LOG; i++) {
             for (int j = 0; j < n; j++) {
