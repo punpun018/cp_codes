@@ -27,3 +27,6 @@ struct Hash
         return {hash1, hash2};
     }
 };
+
+//Notes:
+1. Some changes in the hash function may be required depending on the question for example in binary string(0101) change 'a' to '0'
