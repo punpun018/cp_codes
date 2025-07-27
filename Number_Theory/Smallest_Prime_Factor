@@ -27,3 +27,26 @@ vector<int> getpr(int x)
     }
     return v;
 }
+
+
+
+//SPF with a limit
+
+    vector<int> mind;
+    vector<bool> is_prime;
+
+    void precal(int limit) {
+        mind.assign(limit + 1, 0);
+        is_prime.assign(limit + 1, true);
+        is_prime[0] = is_prime[1] = false;
+        for (int i = 2; i <= limit; i++) {
+            if (mind[i] == 0) {
+                mind[i] = i;
+                for (int j = i * 2; j <= limit; j += i) {
+                    if (mind[j] == 0)
+                        mind[j] = i;
+                    is_prime[j] = false;
+                }
+            }
+        }
+    }
