@@ -1,13 +1,14 @@
 class UnionFind
 {
 private:
-    vector<int> p, rank;
+    vector<int> p, rank, size;
 
 public:
     UnionFind(int n)
     {
         rank.assign(n, 0);
-        p.assign(n, 0);
+        p.resize(n);
+        size.assign(n, 1);
         iota(p.begin(), p.end(), 0);
     }
 
@@ -27,13 +28,22 @@ public:
         {
             int x = findSet(i), y = findSet(j);
             if (rank[x] > rank[y])
+            {
                 p[y] = x;
+                size[x] += size[y];
+            }
             else
             {
                 p[x] = y;
+                size[y] += size[x];
                 if (rank[x] == rank[y])
                     rank[y]++;
             }
         }
+    }
+
+    int getSize(int i)
+    {
+        return size[findSet(i)];
     }
 };
