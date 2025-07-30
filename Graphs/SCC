@@ -1,0 +1,43 @@
+void topoSort(int node, vector<int>* edges, vector<int>& topo, vector<bool>& visited) {
+    visited[node] = true;
+    for (int neighbor : edges[node]) {
+        if (!visited[neighbor]) {
+            topoSort(neighbor, edges, topo, visited);
+        }
+    }
+    topo.push_back(node);
+}
+
+void getComponent(int node, vector<int>* edgesT, vector<int>& comp, vector<bool>& visited) {
+    visited[node] = true;
+    comp.push_back(node);
+    for (int neighbor : edgesT[node]) {
+        if (!visited[neighbor]) {
+            getComponent(neighbor, edgesT, comp, visited);
+        }
+    }
+}
+
+vector<vector<int>> getSCC(int n, vector<int>* edges, vector<int>* edgesT) {
+    vector<bool> visited(n);
+    vector<int> topo;
+
+    for (int i = 0; i < n; i++) {
+        if (!visited[i]) {
+            topoSort(i, edges, topo, visited);
+        }
+    }
+
+    fill(visited.begin(), visited.end(), false);
+    vector<vector<int>> SCC;
+
+    for (int i = topo.size() - 1; i >= 0; i--) {
+        if (!visited[topo[i]]) {
+            vector<int> comp;
+            getComponent(topo[i], edgesT, comp, visited);
+            SCC.push_back(comp);
+        }
+    }
+
+    return SCC;
+}
