@@ -1,1 +1,36 @@
-code
+    long long countnMerge(vector<long long>& nums, int l, int mid, int r) {
+        int n1 = mid - l + 1, n2 = r - mid;
+        vector<long long> left(n1), right(n2);
+        for (int i = 0; i < n1; i++) {
+            left[i] = nums[i + l];
+        }
+        for (int i = 0; i < n2; i++) {
+            right[i] = nums[mid + 1 + i];
+        }
+        long long res = 0;
+        int i = 0, j = 0, k = l;
+        while (i < n1 && j < n2) {
+            if (left[i] <= right[j])
+                nums[k++] = left[i++];
+            else {
+                nums[k++] = right[j++];
+                res += (n1 - i);
+            }
+        }
+        while (i < n1)
+            nums[k++] = left[i++];
+        while (j < n2)
+            nums[k++] = right[j++];
+        return res;
+    }
+
+    long long countInv(vector<long long>& nums, int l, int r) {
+        long long res = 0;
+        if (l < r) {
+            int mid = (l + r) / 2;
+            res += countInv(nums, l, mid);
+            res += countInv(nums, mid + 1, r);
+            res += countnMerge(nums, l, mid, r);
+        }
+        return res;
+    }
