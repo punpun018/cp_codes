@@ -1,123 +1,76 @@
-struct Query {
-        int l, r, idx;
-    };
-
+struct MoCmp
+{
     int block;
-
-    bool compare(const Query& a, const Query& b) {
-        int blockA = a.l / block;
-        int blockB = b.l / block;
-
-        if (blockA != blockB)
-            return blockA < blockB;
-
-        return a.r < b.r;
+    MoCmp(int block)
+    {
+        this->block = block;
     }
-
-    vector<bool> calc(vector<int>& nums, int k,
-                      vector<vector<int>>& queries) {
-
-        int n = nums.size();
-        int m = queries.size();
-
-        block = sqrt(n);
-
-        vector<Query> q(m);
-
-        for (int i = 0; i < m; i++)
-            q[i] = {queries[i][0], queries[i][1], i};
-
-        sort(q.begin(), q.end(),
-             [&](const Query& a, const Query& b) {
-                 return compare(a, b);
-             });
-
-        vector<bool> ans(m);
-
-        unordered_map<int, int> freq;
-
-        int currL = 0;
-        int currR = -1;
-
-        int distinct = 0;
-        int oddFreq = 0;
-
-        for (auto& query : q) {
-            int L = query.l;
-            int R = query.r;
-
-            // Add from right
-            while (currR < R) {
-                currR++;
-
-                int x = nums[currR];
-
-                if (freq[x] % 2 == 0)
-                    oddFreq++;
-                else
-                    oddFreq--;
-
-                freq[x]++;
-
-                if (freq[x] == 1)
-                    distinct++;
-            }
-
-
-            // Add from left
-            while (currL > L) {
-                currL--;
-
-                int x = nums[currL];
-
-                if (freq[x] % 2 == 0)
-                    oddFreq++;
-                else
-                    oddFreq--;
-
-                freq[x]++;
-
-                if (freq[x] == 1)
-                    distinct++;
-            }
-
-            // Remove from left
-            while (currL < L) {
-                int x = nums[currL];
-
-                if (freq[x] % 2 == 1)
-                    oddFreq--;
-                else
-                    oddFreq++;
-
-                freq[x]--;
-
-                if (freq[x] == 0)
-                    distinct--;
-
-                currL++;
-            }
-
-            // Remove from right
-            while (currR > R) {
-                int x = nums[currR];
-
-                if (freq[x] % 2 == 1)
-                    oddFreq--;
-                else
-                    oddFreq++;
-
-                freq[x]--;
-
-                if (freq[x] == 0)
-                    distinct--;
-
-                currR--;
-            }
-
-            ans[query.idx] = (distinct == k && oddFreq == 0);
-            cout << distinct <<" "<< oddFreq << endl;
-        }
-
-        return ans;
+    bool operator()(const pair<pair<int, int>, int> &a, const pair<pair<int, int>, int> &b) const
+    {
+        int ba = a.first.first / block;
+        int bb = b.first.first / block;
+        if (ba != bb)
+            return ba < bb;
+        return (ba & 1) ? a.first.second > b.first.second
+                        : a.first.second < b.first.second;
     }
+};
+ 
+template <typename Range>
+Range moQuery(int n, vector<long long> &arr, vector<pair<int, int>> &queries)
+{ // Never change this
+    int q = (int)queries.size();
+    Range range(arr, q);
+    const int block = max(1, (int)sqrt(n));
+ 
+    // Tag queries with original index, then sort by Mo's order
+    vector<pair<pair<int, int>, int>> indexed(q);
+    for (int i = 0; i < q; i++)
+        indexed[i] = {{queries[i].first, queries[i].second}, i};
+ 
+    // Sort: primary key = block of l; secondary key = r, alternating direction
+    // per block (odd blocks descending) to reduce total pointer movement
+    sort(indexed.begin(), indexed.end(), MoCmp(block));
+ 
+    int lo = 0, hi = -1;
+    for (auto &[bounds, origIdx] : indexed)
+    {
+        auto [l, r] = bounds;
+        while (hi < r)
+            range.add(arr[++hi]);
+        while (lo > l)
+            range.add(arr[--lo]);
+        while (hi > r)
+            range.rem(arr[hi--]);
+        while (lo < l)
+            range.rem(arr[lo++]);
+        range.save(origIdx);
+    }
+    return range;
+}
+ 
+// Example: sum of elements in each query range
+struct Range1
+{
+    long long cur; // store current window aggregate; may change
+    vector<long long> ans;
+ 
+    Range1(vector<long long> &, int q)
+    { // Identity state; may change
+        cur = 0;
+        ans.assign(q, 0);
+    }
+ 
+    void add(long long val)
+    { // element enters window; may change
+        cur += val;
+    }
+    void rem(long long val)
+    { // element leaves window; may change
+        cur -= val;
+    }
+    void save(int idx)
+    { // save answer for query idx; may change
+        ans[idx] = cur;
+    }
+};
